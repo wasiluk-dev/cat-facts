@@ -13,6 +13,7 @@ ServiceProvider serviceProvider = new ServiceCollection()
     .BuildServiceProvider();
 
 IResponseService<CatFact> responseService = serviceProvider.GetRequiredService<IResponseService<CatFact>>();
+IFileService fileService = serviceProvider.GetRequiredService<IFileService>();
 
 while (true)
 {
@@ -41,6 +42,11 @@ while (true)
         }
 
         Console.WriteLine();
+    }
+    else if (input == "clear")
+    {
+        fileService.Delete(FileName);
+        Console.WriteLine("All of your cat facts have been deleted :(" + Environment.NewLine);
     }
     else
     {
