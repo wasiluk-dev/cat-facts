@@ -4,6 +4,7 @@ using CatFacts.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 const string ApiUrl = "https://catfact.ninja/fact";
+const string FactsNotFoundMessage = "You haven't saved any cat facts yet, give it a try!";
 const string FileName = "facts.txt";
 
 ServiceProvider serviceProvider = new ServiceCollection()
@@ -42,6 +43,13 @@ while (true)
                 .Select(x => x.First())
                 .ToList();
             
+            // the file exists, but it's empty
+            if (responses.Count == 0)
+            {
+                Console.WriteLine(FactsNotFoundMessage + Environment.NewLine);
+                continue;
+            }
+            
             Console.WriteLine("Previously fetched cat facts:");
             foreach (CatFact response in responses)
             {
@@ -52,7 +60,7 @@ while (true)
         }
         catch (FileNotFoundException)
         {
-            Console.WriteLine("You haven't saved any cat facts yet, give it a try!" + Environment.NewLine);
+            Console.WriteLine(FactsNotFoundMessage + Environment.NewLine);
         }
     }
     else if (input == "clear")
