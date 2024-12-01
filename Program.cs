@@ -33,15 +33,22 @@ while (true)
 
     if (input == "list")
     {
-        List<CatFact> responses = responseService.ReadResponsesFromFile(FileName);
-            
-        Console.WriteLine("Previously fetched cat facts:");
-        foreach (CatFact response in responses)
+        try
         {
-            Console.WriteLine("– " + response.Fact);
-        }
+            List<CatFact> responses = responseService.ReadResponsesFromFile(FileName);
+            
+            Console.WriteLine("Previously fetched cat facts:");
+            foreach (CatFact response in responses)
+            {
+                Console.WriteLine("– " + response.Fact);
+            }
 
-        Console.WriteLine();
+            Console.WriteLine();
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("You haven't saved any cat facts yet, give it a try!" + Environment.NewLine);
+        }
     }
     else if (input == "clear")
     {
