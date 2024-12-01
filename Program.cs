@@ -30,7 +30,19 @@ while (true)
         break;
     }
 
-    if (input == "fact")
+    if (input == "list")
+    {
+        List<CatFact> responses = responseService.ReadResponsesFromFile(FileName);
+            
+        Console.WriteLine("Previously fetched cat facts:");
+        foreach (CatFact response in responses)
+        {
+            Console.WriteLine("– " + response.Fact);
+        }
+
+        Console.WriteLine();
+    }
+    else if (input == "fact")
     {
         Console.WriteLine("Fetching a fact, please wait...");
         CatFact? response = await responseService.FetchResponseAsync(ApiUrl);
