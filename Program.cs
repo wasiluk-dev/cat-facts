@@ -16,8 +16,8 @@ IResponseService<CatFact> responseService = serviceProvider.GetRequiredService<I
 
 while (true)
 {
-    Console.WriteLine("Available commands:" + Environment.NewLine +
-                      "– 'fact' to get a cool cat fact," + Environment.NewLine + 
+    Console.WriteLine("Press [ENTER] to get a cool cat fact!" + Environment.NewLine +
+                      "Available commands:" + Environment.NewLine +
                       "– 'list' to see all the previously fetched facts," + Environment.NewLine + 
                       "– 'clear' to delete all the stored facts," + Environment.NewLine + 
                       "– 'exit' to exit the app.");
@@ -42,7 +42,7 @@ while (true)
 
         Console.WriteLine();
     }
-    else if (input == "fact")
+    else
     {
         Console.WriteLine("Fetching a fact, please wait...");
         CatFact? response = await responseService.FetchResponseAsync(ApiUrl);
