@@ -35,7 +35,12 @@ while (true)
     {
         try
         {
-            List<CatFact> responses = responseService.ReadResponsesFromFile(FileName);
+            // get all the facts and remove duplicates
+            List<CatFact> responses = responseService
+                .ReadResponsesFromFile(FileName)
+                .GroupBy(x => x.Fact)
+                .Select(x => x.First())
+                .ToList();
             
             Console.WriteLine("Previously fetched cat facts:");
             foreach (CatFact response in responses)
