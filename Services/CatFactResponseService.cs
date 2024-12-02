@@ -13,15 +13,27 @@ public partial class CatFactResponseService(IHttpClientFactory httpClientFactory
     [GeneratedRegex("""(?<=",)[0-9]+(?=)""")]
     private static partial Regex LengthRegex();
     
+    /// <inheritdoc/>
+    /// <exception cref="HttpRequestException">The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation or timeout, or the response is unsuccessful.</exception>
+    /// <exception cref="TaskCanceledException">The request failed due to timeout.</exception>
     public async Task<CatFact?> FetchResponseAsync(string url)
     {
         HttpClient client = httpClientFactory.CreateClient();
-        HttpResponseMessage response = await client.GetAsync(url);
         
-        response.EnsureSuccessStatusCode();
-        return JsonSerializer.Deserialize<CatFact>(await response.Content.ReadAsStringAsync());
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            
+            return JsonSerializer.Deserialize<CatFact>(await response.Content.ReadAsStringAsync());
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
+    /// <inheritdoc/>
     public List<CatFact> ReadResponsesFromFile(string path)
     {
         List<CatFact> responses = [];
@@ -36,6 +48,7 @@ public partial class CatFactResponseService(IHttpClientFactory httpClientFactory
         return responses;
     }
 
+    /// <inheritdoc/>
     public void SaveResponseToFile(string path, CatFact response)
     {
         // escape double quotes before saving
