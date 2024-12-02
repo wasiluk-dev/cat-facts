@@ -67,14 +67,14 @@ while (true)
     }
     else if (input == "clear")
     {
-        if (fileService.Exists(FileName))
+        if (!fileService.Exists(FileName))
         {
-            fileService.Delete(FileName);
-            Console.WriteLine("The cat facts file has been deleted :(" + Environment.NewLine);
+            Console.WriteLine(FactsNotFoundMessage + Environment.NewLine);
             continue;
         }
         
-        Console.WriteLine(FactsNotFoundMessage + Environment.NewLine);
+        fileService.Delete(FileName);
+        Console.WriteLine("The cat facts file has been deleted :(" + Environment.NewLine);
     }
     else
     {
