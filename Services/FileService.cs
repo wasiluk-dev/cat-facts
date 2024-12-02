@@ -14,6 +14,11 @@ public class FileService : IFileService
         File.Delete(path);
     }
 
+    public bool Exists(string path)
+    {
+        return File.Exists(path);
+    }
+
     public IEnumerable<string> ReadLines(string path)
     {
         return File.ReadLines(path);
