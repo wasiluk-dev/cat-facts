@@ -31,6 +31,7 @@ while (true)
     
     if (input == "exit")
     {
+        Console.WriteLine("Closing the app...");
         break;
     }
 
