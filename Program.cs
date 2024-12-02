@@ -84,36 +84,35 @@ while (true)
             CatFact? response = await responseService.FetchResponseAsync(ApiUrl);
 
             Console.Clear();
-            if (response != null)
+            if (response == null)
             {
-                string fact = response.Fact;
-                Regex regex = NotLastSentencePeriodOrBangRegex();
+                Console.WriteLine(FactFetchingErrorMessage + Environment.NewLine);
+                continue;
+            }
             
-                if (regex.Match(fact).Success)
-                {
-                    fact = regex.Replace(fact, "?", 1);
-                }
-                else
-                {
-                    if (fact[^1] is '.' or '!')
-                    {
-                        fact = fact.Remove(fact.Length - 1, 1) + '?';
-                    }
-                    // the end of the sentence is missing punctuation
-                    else
-                    {
-                        fact += '?';
-                    }
-                }
-            
-                Console.WriteLine("Did you know that..." + Environment.NewLine +
-                                  $"...{fact[0].ToString().ToLower()}{fact[1..]}" + Environment.NewLine);
-                responseService.SaveResponseToFile(FileName, response);
+            string fact = response.Fact;
+            Regex regex = NotLastSentencePeriodOrBangRegex();
+        
+            if (regex.Match(fact).Success)
+            {
+                fact = regex.Replace(fact, "?", 1);
             }
             else
             {
-                Console.WriteLine(FactFetchingErrorMessage + Environment.NewLine);
+                if (fact[^1] is '.' or '!')
+                {
+                    fact = fact.Remove(fact.Length - 1, 1) + '?';
+                }
+                // the end of the sentence is missing punctuation
+                else
+                {
+                    fact += '?';
+                }
             }
+        
+            Console.WriteLine("Did you know that..." + Environment.NewLine +
+                              $"...{fact[0].ToString().ToLower()}{fact[1..]}" + Environment.NewLine);
+            responseService.SaveResponseToFile(FileName, response);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
