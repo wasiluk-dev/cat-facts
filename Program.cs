@@ -5,8 +5,9 @@ using CatFacts.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 const string ApiUrl = "https://catfact.ninja/fact";
-const string FactsNotFoundMessage = "You haven't saved any cat facts yet, give it a try!";
 const string FileName = "facts.txt";
+const string FactFetchingErrorMessage = "Couldn't get any cat facts right now, please try again later.";
+const string FactsNotFoundMessage = "You haven't saved any cat facts yet, give it a try!";
 
 ServiceProvider serviceProvider = new ServiceCollection()
     .AddHttpClient()
@@ -78,34 +79,45 @@ while (true)
     else
     {
         Console.WriteLine("Fetching a fact, please wait...");
-        CatFact? response = await responseService.FetchResponseAsync(ApiUrl);
-
-        Console.Clear();
-        if (response != null)
+        try
         {
-            string fact = response.Fact;
-            Regex regex = NotLastSentencePeriodOrBangRegex();
-            
-            if (regex.Match(fact).Success)
+            CatFact? response = await responseService.FetchResponseAsync(ApiUrl);
+
+            Console.Clear();
+            if (response != null)
             {
-                fact = regex.Replace(fact, "?", 1);
+                string fact = response.Fact;
+                Regex regex = NotLastSentencePeriodOrBangRegex();
+            
+                if (regex.Match(fact).Success)
+                {
+                    fact = regex.Replace(fact, "?", 1);
+                }
+                else
+                {
+                    if (fact[^1] is '.' or '!')
+                    {
+                        fact = fact.Remove(fact.Length - 1, 1) + '?';
+                    }
+                    // the end of the sentence is missing punctuation
+                    else
+                    {
+                        fact += '?';
+                    }
+                }
+            
+                Console.WriteLine("Did you know that..." + Environment.NewLine +
+                                  $"...{fact[0].ToString().ToLower()}{fact[1..]}" + Environment.NewLine);
+                responseService.SaveResponseToFile(FileName, response);
             }
             else
             {
-                if (fact[^1] is '.' or '!')
-                {
-                    fact = fact.Remove(fact.Length - 1, 1) + '?';
-                }
-                // the end of the sentence is missing punctuation
-                else
-                {
-                    fact += '?';
-                }
+                Console.WriteLine(FactFetchingErrorMessage + Environment.NewLine);
             }
-            
-            Console.WriteLine("Did you know that..." + Environment.NewLine +
-                              $"...{fact[0].ToString().ToLower()}{fact[1..]}" + Environment.NewLine);
-            responseService.SaveResponseToFile(FileName, response);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            Console.WriteLine(FactFetchingErrorMessage + Environment.NewLine);
         }
     }
 }
