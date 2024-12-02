@@ -38,6 +38,8 @@ public partial class CatFactResponseService(IHttpClientFactory httpClientFactory
 
     public void SaveResponseToFile(string path, CatFact response)
     {
-        fileService.AppendAllText(path, $"\"{response.Fact}\",{response.Length}");
+        // escape double quotes before saving
+        string fact = response.Fact.Replace("\"", "\"\"");
+        fileService.AppendAllText(path, $"\"{fact}\",{response.Length}");
     }
 }
