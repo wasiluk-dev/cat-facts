@@ -1,4 +1,5 @@
-﻿using CatFacts.Interfaces;
+﻿using System.Text.RegularExpressions;
+using CatFacts.Interfaces;
 using CatFacts.Models;
 using CatFacts.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,11 +80,38 @@ while (true)
         Console.WriteLine("Fetching a fact, please wait...");
         CatFact? response = await responseService.FetchResponseAsync(ApiUrl);
 
+        Console.Clear();
         if (response != null)
         {
-            Console.Clear();
-            Console.WriteLine(response.Fact + Environment.NewLine);
+            string fact = response.Fact;
+            Regex regex = NotLastSentencePeriodOrBangRegex();
+            
+            if (regex.Match(fact).Success)
+            {
+                fact = regex.Replace(fact, "?", 1);
+            }
+            else
+            {
+                if (fact[^1] is '.' or '!')
+                {
+                    fact = fact.Remove(fact.Length - 1, 1) + '?';
+                }
+                // the end of the sentence is missing punctuation
+                else
+                {
+                    fact += '?';
+                }
+            }
+            
+            Console.WriteLine("Did you know that..." + Environment.NewLine +
+                              $"...{fact[0].ToString().ToLower()}{fact[1..]}" + Environment.NewLine);
             responseService.SaveResponseToFile(FileName, response);
         }
     }
+}
+
+internal abstract partial class Program
+{
+    [GeneratedRegex("""[\.|!](?=\s+[A-Z])""")]
+    private static partial Regex NotLastSentencePeriodOrBangRegex();
 }
